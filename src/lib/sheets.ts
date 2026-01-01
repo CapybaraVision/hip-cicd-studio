@@ -33,7 +33,11 @@ export const getDoc = () => {
 export const doc = new Proxy({} as GoogleSpreadsheet, {
   get: (_target, prop) => {
     const instance = getDoc();
-    return (instance as any)[prop];
+    const value = (instance as any)[prop];
+    if (typeof value === 'function') {
+      return value.bind(instance);
+    }
+    return value;
   }
 });
 
