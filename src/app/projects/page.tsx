@@ -54,53 +54,48 @@ export default function ProjectsPage() {
     };
 
     return (
-        <div style={{ display: 'flex' }}>
-            <Sidebar />
-            <main style={{ flex: 1, marginLeft: 80, minHeight: '100vh', padding: '2rem' }}>
-                <Container size="xl">
-                    <Group justify="space-between" mb="xl">
-                        <div>
-                            <Title order={1}>System Status</Title>
-                            <Text c="dimmed">Monitor microservices capability and health.</Text>
-                        </div>
-                        <Group>
-                            <Button variant="subtle" onClick={fetchProjects} leftSection={<RefreshCw size={16} />}>Refresh</Button>
-                            <Button leftSection={<Plus size={18} />} variant="gradient" gradient={{ from: 'teal', to: 'lime' }} onClick={open}>Add Service</Button>
-                        </Group>
-                    </Group>
+        <Container size="xl" p={0}>
+            <Group justify="space-between" mb="xl">
+                <div>
+                    <Title order={1}>System Status</Title>
+                    <Text c="dimmed">Monitor microservices capability and health.</Text>
+                </div>
+                <Group>
+                    <Button variant="subtle" onClick={fetchProjects} leftSection={<RefreshCw size={16} />}>Refresh</Button>
+                    <Button leftSection={<Plus size={18} />} variant="gradient" gradient={{ from: 'teal', to: 'lime' }} onClick={open}>Add Service</Button>
+                </Group>
+            </Group>
 
-                    <Group mb="xl">
-                        <TextInput
-                            placeholder="Search services..."
-                            leftSection={<Search size={16} />}
-                            style={{ flex: 1 }}
-                        />
-                        <Select
-                            placeholder="Status"
-                            data={['All', 'Active', 'Degraded', 'Maintenance']}
-                            leftSection={<Filter size={16} />}
-                            w={150}
-                        />
-                    </Group>
+            <Group mb="xl">
+                <TextInput
+                    placeholder="Search services..."
+                    leftSection={<Search size={16} />}
+                    style={{ flex: 1 }}
+                />
+                <Select
+                    placeholder="Status"
+                    data={['All', 'Active', 'Degraded', 'Maintenance']}
+                    leftSection={<Filter size={16} />}
+                    w={150}
+                />
+            </Group>
 
-                    {loading ? (
-                        <Center h={300}><Loader /></Center>
-                    ) : (
-                        <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
-                            {projects.map((project) => (
-                                <ProjectCard
-                                    key={project.id}
-                                    title={project.name}
-                                    description={`Repo: ${project.repo}`}
-                                    status={project.status}
-                                    tags={['Service', 'API']}
-                                    lastDeployed={project.last_deploy}
-                                />
-                            ))}
-                        </SimpleGrid>
-                    )}
-                </Container>
-            </main>
+            {loading ? (
+                <Center h={300}><Loader /></Center>
+            ) : (
+                <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
+                    {projects.map((project) => (
+                        <ProjectCard
+                            key={project.id}
+                            title={project.name}
+                            description={`Repo: ${project.repo}`}
+                            status={project.status}
+                            tags={['Service', 'API']}
+                            lastDeployed={project.last_deploy}
+                        />
+                    ))}
+                </SimpleGrid>
+            )}
 
             <Modal opened={opened} onClose={close} title="Register New Service" centered>
                 <Stack>
@@ -109,6 +104,6 @@ export default function ProjectsPage() {
                     <Button onClick={handleCreateProject} loading={submitting} fullWidth mt="md" color="teal">Register Service</Button>
                 </Stack>
             </Modal>
-        </div>
+        </Container>
     );
 }

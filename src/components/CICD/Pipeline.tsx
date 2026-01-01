@@ -129,6 +129,7 @@ export function Pipeline() {
                             <Text size="sm" c="dimmed">Triggered via {selectedBuild.trigger} by @{selectedBuild.author}</Text>
                         </Paper>
 
+                        {/* ... (Traceability section unchanged) ... */}
                         <div>
                             <Text fw={700} mb="sm">Included Features (Traceability)</Text>
                             {selectedBuild.features ? (
@@ -153,6 +154,7 @@ export function Pipeline() {
                         <div>
                             <Text fw={700} mb="sm">Deployment Timeline</Text>
                             <Timeline active={selectedBuild.status === 'Success' ? 3 : 1} bulletSize={24} lineWidth={2}>
+                                {/* ... (Timeline Items unchanged) ... */}
                                 <Timeline.Item bullet={<GitCommit size={12} />} title="Code Checkout">
                                     <Text c="dimmed" size="xs">Pulled from main branch</Text>
                                 </Timeline.Item>
@@ -171,8 +173,52 @@ export function Pipeline() {
                         <Paper withBorder p="md" radius="md" mt="auto">
                             <Text fw={700} mb="md">Release Actions</Text>
                             <Group grow>
-                                <Button color="red" leftSection={<RotateCcw size={16} />} variant="light">Rollback v{selectedBuild.version}</Button>
-                                <Button color="blue" leftSection={<Play size={16} />} variant="light">Re-deploy</Button>
+                                <Button
+                                    color="red"
+                                    leftSection={<RotateCcw size={16} />}
+                                    variant="light"
+                                    onClick={async () => {
+                                        if (confirm(`Emergency Rollback to v${selectedBuild.version}? This will revert production immediately.`)) {
+                                            await fetch('/api/webhooks/deploy', {
+                                                method: 'POST',
+                                                body: JSON.stringify({
+                                                    ref: 'main',
+                                                    commit: 'ROLLBACK',
+                                                    sender: { login: 'admin-action' },
+                                                    head_commit: { message: `Rollback to v${selectedBuild.version}`, id: `rollback-${selectedBuild.version}` }
+                                                })
+                                            });
+                                            close();
+                                            fetchPipelines();
+                                            alert('Rollback initiated successfully.');
+                                        }
+                                    }}
+                                >
+                                    Rollback v{selectedBuild.version}
+                                </Button>
+                                <Button
+                                    color="blue"
+                                    leftSection={<Play size={16} />}
+                                    variant="light"
+                                    onClick={async () => {
+                                        if (confirm(`Re-deploy v${selectedBuild.version}?`)) {
+                                            await fetch('/api/webhooks/deploy', {
+                                                method: 'POST',
+                                                body: JSON.stringify({
+                                                    ref: 'main',
+                                                    commit: 'REDEPLOY',
+                                                    sender: { login: 'admin-action' },
+                                                    head_commit: { message: `Re-deploy v${selectedBuild.version}`, id: `redeploy-${selectedBuild.version}` }
+                                                })
+                                            });
+                                            close();
+                                            fetchPipelines();
+                                            alert('Re-deployment started.');
+                                        }
+                                    }}
+                                >
+                                    Re-deploy
+                                </Button>
                             </Group>
                         </Paper>
                     </Stack>

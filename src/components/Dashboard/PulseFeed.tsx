@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Paper, Text, Timeline, ThemeIcon, Group, Badge, Switch, Tooltip, Loader, Center } from '@mantine/core';
+import { Paper, Text, Timeline, ThemeIcon, Group, Badge, Switch, Tooltip, Loader, Center, ScrollArea } from '@mantine/core';
 import { GitCommit, Rocket, DollarSign, Activity, AlertCircle, Bot } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -75,25 +75,27 @@ export function PulseFeed() {
                     <Loader size="sm" variant="dots" />
                 </Center>
             ) : (
-                <Timeline active={1} bulletSize={24} lineWidth={2}>
-                    {displayEvents.map((event: any, index: number) => (
-                        <Timeline.Item
-                            key={index}
-                            bullet={
-                                <ThemeIcon size={22} variant="gradient" gradient={{ from: event.color === 'gray' ? 'dark.5' : event.color, to: event.color === 'gray' ? 'dark.3' : `${event.color}.4` }} radius="xl">
-                                    <event.icon size={12} />
-                                </ThemeIcon>
-                            }
-                            title={<Text size="sm" fw={600} c="white">{event.title}</Text>}
-                            lineVariant="dashed"
-                        >
-                            <Text c="dimmed" size="xs" mt={4}>
-                                {aiMode ? event.plain : event.tech}
-                            </Text>
-                            <Text c="dimmed" size="xs" mt={4} style={{ fontSize: 10 }}>{event.time}</Text>
-                        </Timeline.Item>
-                    ))}
-                </Timeline>
+                <ScrollArea h={400} offsetScrollbars>
+                    <Timeline active={1} bulletSize={24} lineWidth={2}>
+                        {displayEvents.map((event: any, index: number) => (
+                            <Timeline.Item
+                                key={index}
+                                bullet={
+                                    <ThemeIcon size={22} variant="gradient" gradient={{ from: event.color === 'gray' ? 'dark.5' : event.color, to: event.color === 'gray' ? 'dark.3' : `${event.color}.4` }} radius="xl">
+                                        <event.icon size={12} />
+                                    </ThemeIcon>
+                                }
+                                title={<Text size="sm" fw={600} c="white">{event.title}</Text>}
+                                lineVariant="dashed"
+                            >
+                                <Text c="dimmed" size="xs" mt={4}>
+                                    {aiMode ? event.plain : event.tech}
+                                </Text>
+                                <Text c="dimmed" size="xs" mt={4} style={{ fontSize: 10 }}>{event.time}</Text>
+                            </Timeline.Item>
+                        ))}
+                    </Timeline>
+                </ScrollArea>
             )}
         </Paper>
     );
