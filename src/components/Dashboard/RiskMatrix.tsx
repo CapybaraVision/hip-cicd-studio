@@ -1,7 +1,7 @@
 'use client';
 
 import { Paper, Title, Text, Group, Badge } from '@mantine/core';
-import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, ResponsiveContainer, ReferenceArea } from 'recharts';
+import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, ResponsiveContainer, ReferenceArea, Cell } from 'recharts';
 import { AlertTriangle } from 'lucide-react';
 
 const data = [
@@ -49,7 +49,7 @@ export function RiskMatrix() {
 
                         <Scatter name="Risks" data={data} fill="#8884d8">
                             {data.map((entry, index) => (
-                                <cell key={`cell-${index}`} fill={entry.type === 'High' ? '#fa5252' : entry.type === 'Medium' ? '#fab005' : '#40c057'} />
+                                <Cell key={`cell-${index}`} fill={entry.type === 'High' ? '#fa5252' : entry.type === 'Medium' ? '#fab005' : '#40c057'} />
                             ))}
                         </Scatter>
                     </ScatterChart>
