@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Paper, Title, Text, Group, ThemeIcon, Stack, Table, Badge, Loader, Center, Button, Drawer, Timeline, ActionIcon, List, Alert } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { GitCommit, Package, TestTube, Rocket, CheckCircle2, XCircle, Clock, RefreshCw, AlertTriangle, RotateCcw, Play, ExternalLink } from 'lucide-react';
+import { PipelineVisual } from './PipelineVisual';
 
 export function Pipeline() {
     const [pipelines, setPipelines] = useState<any[]>([]);
@@ -62,6 +63,8 @@ export function Pipeline() {
                 </div>
                 <Button variant="light" leftSection={<RefreshCw size={16} />} onClick={fetchPipelines}>Refresh</Button>
             </Group>
+
+            <PipelineVisual />
 
             {loading ? (
                 <Center h={200}><Loader /></Center>
