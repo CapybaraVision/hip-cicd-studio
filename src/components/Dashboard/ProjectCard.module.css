@@ -1,0 +1,52 @@
+.card {
+    position: relative;
+    background: rgba(30, 31, 35, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible;
+
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+        transform: translateY(-5px);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+        background: rgba(30, 31, 35, 0.6);
+
+        &:before {
+            opacity: 1;
+        }
+
+        .title {
+            background: linear-gradient(135deg, var(--mantine-color-brand-3) 0%, var(--mantine-color-accent-4) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    }
+}
+
+.section {
+    padding-bottom: var(--mantine-spacing-xs);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.footer {
+    padding: var(--mantine-spacing-md);
+    margin-top: var(--mantine-spacing-md);
+    background: rgba(0, 0, 0, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.title {
+    transition: all 0.3s ease;
+}

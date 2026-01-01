@@ -1,0 +1,15 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000",
+  "executionArgs": {
+    "projectName": "hip-cicd-studio",
+    "projectPath": "/Users/pank/hip-cicd-studio",
+    "testIds": [],
+    "additionalInstruction": "Focus on verifying dashboard layout, navigation links, and correct rendering of charts and Kanban board.",
+    "envs": {
+      "API_KEY": "sk-user-FtNPcJousyPzP2IjTYVdUE2XyWh_ughIE2hJldYIVL3191VRRdpdN-0R8hDicmA2R1IYNO4D4voQ3M_Z5JBxcHCv8eg_wU1U9GVrpPI9_B40XI9Zo0qxXFcjWtfxpGLXmCA"
+    }
+  }
+}

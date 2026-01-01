@@ -1,0 +1,278 @@
+[
+  {
+    "id": "TC001",
+    "title": "Dashboard Home Rendering",
+    "description": "Verify the Dashboard home page loads correctly with all KPI cards, user growth charts, and risk matrices displayed in Bento Grid layout.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the Dashboard home page after login"
+      },
+      {
+        "type": "assertion",
+        "description": "Check that all KPI cards, User Growth Chart, and Risk Matrix components are visible and correctly rendered"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the Bento Grid layout aligns properly without overflow or clipping on desktop and mobile"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Sidebar Navigation Functionality",
+    "description": "Ensure the Sidebar navigation updates active state correctly when navigating between Dashboard, Projects, and CI/CD Pipeline pages.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Click the Sidebar link for Dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the Dashboard page loads and Sidebar highlights the Dashboard link"
+      },
+      {
+        "type": "action",
+        "description": "Click the Sidebar link for Projects"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the Projects page loads and Sidebar highlights the Projects link"
+      },
+      {
+        "type": "action",
+        "description": "Click the Sidebar link for CI/CD Pipeline"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the CI/CD Pipeline page loads and Sidebar highlights the CI/CD link"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Theme Switching and UI Consistency",
+    "description": "Validate that light and dark modes toggle correctly from the Theme Provider and all UI elements, including sidebar, dashboards, and cards update styles accordingly with no visual glitches.",
+    "category": "ui",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Switch the theme from light to dark mode using the UI toggle"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all components adopt the dark mode styling following color guidelines, including Projects and CI/CD pages"
+      },
+      {
+        "type": "action",
+        "description": "Switch back to light mode"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm all components revert to light mode styling consistently with no layout shifts"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Responsive Layout on Various Screen Sizes",
+    "description": "Test the responsiveness of all main pages (Dashboard, Projects, CI/CD) ensuring no content overflow or UI element obstruction occurs on mobile devices and ultra-wide monitors.",
+    "category": "ui",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Resize browser window to typical mobile width (375px)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify layout rearranges fluidly with no overflow, text clipping or UI obstruction"
+      },
+      {
+        "type": "action",
+        "description": "Resize browser window to ultra-wide monitor width (>1920px)"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the layout maintains max-width constraints and content remains centered and readable"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Kanban Board Drag and Drop",
+    "description": "Validate drag-and-drop functionality for moving tasks across different Kanban columns and check persistence of the updated state after page refresh.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the Projects page and open the Kanban board"
+      },
+      {
+        "type": "action",
+        "description": "Drag a task card from one status column to another"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the task card visually moves to the target column"
+      },
+      {
+        "type": "action",
+        "description": "Refresh the page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the task remains in the new column reflecting state persistence locally or via backend"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Projects Search and Filtering",
+    "description": "Test the search input functionality on the Projects listing page and Kanban board to ensure live client-side filtering returns accurate results.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the Projects listing page"
+      },
+      {
+        "type": "action",
+        "description": "Enter a search term in the project search input"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the project list filters in real-time to match the search term"
+      },
+      {
+        "type": "action",
+        "description": "Clear the search input"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the full project list is shown again"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "CI/CD Pipeline Visualization Updates",
+    "description": "Verify that the CI/CD pipeline page shows detailed visualization of pipeline stages and dynamically updates running and pending step statuses in real-time.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the CI/CD Pipeline page"
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure all pipeline stages and steps are displayed with correct initial statuses"
+      },
+      {
+        "type": "assertion",
+        "description": "Observe for real-time simulation updates where running/pending steps periodically change their status dynamically"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Chart Tooltip Visibility and Z-Index",
+    "description": "Check that tooltips on all charts, such as user growth charts and KPI cards, appear fully visible and are not clipped or hidden behind other UI elements.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Hover over various data points on charts in the Dashboard and Business Command Center"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify tooltips appear promptly, fully visible with proper z-index layering above other controls"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Hydration and SSR Handling",
+    "description": "Ensure that the application has no React hydration warnings by correctly handling server-side rendering, especially for theme toggling and localStorage access for Kanban state.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load any main page (Dashboard, Projects, or CI/CD) in production mode"
+      },
+      {
+        "type": "assertion",
+        "description": "Check console logs to confirm no hydration warnings or errors are present"
+      },
+      {
+        "type": "action",
+        "description": "Toggle theme and refresh the page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify hydration remains clean and theme state persists without warnings"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Localization and Language Consistency",
+    "description": "Validate that all user-facing text throughout the application is consistent in language, and centralized string management prevents mixed language or untranslated strings.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate through all main pages and UI components including Sidebar, Dashboard KPIs, Project cards, Kanban labels, and CI/CD pipeline questions"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all text is in the expected language without mixed or missing translations"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Visual Effects Performance on Lower-End Devices",
+    "description": "Assess the visual effects such as glassmorphism and animations using Framer Motion on low-end devices to confirm smooth performance without UI jank or degradation.",
+    "category": "performance",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Access the app on a lower-end or throttled device/browser setup"
+      },
+      {
+        "type": "assertion",
+        "description": "Observe UI transitions, glassmorphism effects, and animations for smoothness without frame drops or freezes"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Code Quality and Bundle Optimization Validation",
+    "description": "Verify that the codebase has no unused imports and passes performance audits for bundle size optimization, especially for Recharts and Framer Motion libraries.",
+    "category": "performance",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Run static code analysis tools and bundle size analyzer on the production build"
+      },
+      {
+        "type": "assertion",
+        "description": "Check that no unused imports are reported and bundle sizes are within acceptable limits without redundant dependencies"
+      }
+    ]
+  }
+]

@@ -1,0 +1,47 @@
+{
+    "tech_stack": [
+        "TypeScript",
+        "Next.js 15",
+        "Mantine UI v7",
+        "Framer Motion",
+        "Recharts",
+        "Lucide React"
+    ],
+    "features": [
+        {
+            "name": "Dashboard Layout",
+            "description": "Main layout wrapper with Sidebar and Theme Provider.",
+            "files": [
+                "src/app/layout.tsx",
+                "src/components/Layout/Sidebar.tsx"
+            ]
+        },
+        {
+            "name": "Business Command Center",
+            "description": "Main dashboard page with Bento Grid layout, KPI cards, and charts.",
+            "files": [
+                "src/app/page.tsx",
+                "src/components/Business/UserGrowthChart.tsx",
+                "src/components/Dashboard/RiskMatrix.tsx"
+            ]
+        },
+        {
+            "name": "Project Management",
+            "description": "Projects listing page and Kanban board.",
+            "files": [
+                "src/app/projects/page.tsx",
+                "src/components/Project/KanbanBoard.tsx",
+                "src/components/Project/Timeline.tsx",
+                "src/components/Dashboard/ProjectCard.tsx"
+            ]
+        },
+        {
+            "name": "CI/CD Pipeline",
+            "description": "Pipeline visualization and details page.",
+            "files": [
+                "src/app/cicd/page.tsx",
+                "src/components/CICD/Pipeline.tsx"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+.board {
+    display: flex;
+    overflow-x: auto;
+    gap: var(--mantine-spacing-md);
+    padding-bottom: var(--mantine-spacing-md);
+
+    /* Hide scrollbar but keep functionality */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.column {
+    min-width: 280px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--mantine-radius-lg);
+    padding: var(--mantine-spacing-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.taskList {
+    min-height: 100px;
+    transition: background-color 0.2s ease;
+    border-radius: var(--mantine-radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--mantine-spacing-sm);
+
+    &[data-dragging-over] {
+        background-color: rgba(255, 255, 255, 0.03);
+    }
+}
+
+.task {
+    background: var(--mantine-color-dark-7);
+    border-color: rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: var(--mantine-color-brand-6);
+    }
+
+    &[data-dragging] {
+        transform: rotate(3deg);
+        box-shadow: var(--mantine-shadow-xl);
+        border-color: var(--mantine-color-brand-5);
+    }
+}
