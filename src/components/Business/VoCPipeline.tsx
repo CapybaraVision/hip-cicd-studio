@@ -1,39 +1,51 @@
 'use client';
 
-import { Paper, Title, Text, Group, Button, Badge, ScrollArea, Avatar, ActionIcon, Stack, Card } from '@mantine/core';
+import { Paper, Title, Text, Group, Button, Badge, ScrollArea, Avatar, ActionIcon, Stack, Card, Loader, Center } from '@mantine/core';
 import { MessageCircle, ArrowRight, Bug, Zap, CheckCircle2, AlertTriangle, Bot } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-const initialFeedbacks = [
-    { id: 1, user: 'alice@corp.com', avatar: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-1.png', message: 'I cannot update my credit card info, it keeps spinning!', source: 'Intercom', time: '10m ago', type: 'bug' },
-    { id: 2, user: 'bob@startup.io', avatar: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png', message: 'Would love to have a dark mode option for the export PDF.', source: 'Email', time: '1h ago', type: 'feature' },
-    { id: 3, user: 'charlie@dev.net', avatar: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-3.png', message: 'The API seems really slow today in the morning.', source: 'Twitter', time: '2h ago', type: 'performance' },
-];
 
 export function VoCPipeline() {
     const { t } = useLanguage();
-    const [feedbacks, setFeedbacks] = useState(initialFeedbacks);
+    const [feedbacks, setFeedbacks] = useState<any[]>([]);
     const [processed, setProcessed] = useState<any[]>([]);
     const [processing, setProcessing] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    const handleProcess = () => {
+    const fetchData = async () => {
+        try {
+            const res = await fetch('/api/voc');
+            const data = await res.json();
+            setFeedbacks(data.pending || []);
+            setProcessed(data.processed || []);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const handleProcess = async () => {
+        if (feedbacks.length === 0) return;
+
         setProcessing(true);
-        setTimeout(() => {
-            const newTicket = {
-                id: 'T-1042',
-                title: 'Fix Credit Card Update Spinner Logic',
-                priority: 'Critical',
-                tags: ['Payment', 'Frontend'],
-                origin: processed.length === 0 ? feedbacks[0] : null
-            };
+        const target = feedbacks[0];
 
-            if (feedbacks.length > 0) {
-                setProcessed([newTicket, ...processed]);
-                setFeedbacks(feedbacks.slice(1));
-            }
+        try {
+            await fetch('/api/voc', {
+                method: 'POST',
+                body: JSON.stringify({ id: target.id })
+            });
+            await fetchData(); // Refresh
+        } catch (e) {
+            console.error(e);
+        } finally {
             setProcessing(false);
-        }, 1500);
+        }
     };
 
     return (
@@ -42,7 +54,7 @@ export function VoCPipeline() {
                 <Group gap="xs">
                     <MessageCircle size={20} className="mantine-rotate-180" />
                     <Text fw={700}>{t('title.voc')}</Text>
-                    <Badge variant="light" color="blue">3 Pending</Badge>
+                    <Badge variant="light" color="blue">{feedbacks.length} Pending</Badge>
                 </Group>
                 <Button
                     variant="gradient"
@@ -57,58 +69,64 @@ export function VoCPipeline() {
                 </Button>
             </Group>
 
-            <Group align="flex-start" grow>
-                {/* Pending Feedback Column */}
-                <Stack gap="xs" style={{ flex: 1 }}>
-                    <Text size="xs" c="dimmed" fw={700}>{t('voc.incoming')}</Text>
-                    {feedbacks.length === 0 && <Text size="sm" c="dimmed" fs="italic">{t('voc.empty_feedback')}</Text>}
-                    {feedbacks.map((item) => (
-                        <Card key={item.id} p="sm" radius="md" bg="dark.6" withBorder>
-                            <Group justify="space-between" mb="xs">
-                                <Group gap="xs">
-                                    <Avatar src={item.avatar} size="xs" radius="xl" />
-                                    <Text size="xs" fw={500}>{item.user}</Text>
+            {loading ? (
+                <Center h={200}>
+                    <Loader size="sm" variant="dots" />
+                </Center>
+            ) : (
+                <Group align="flex-start" grow>
+                    {/* Pending Feedback Column */}
+                    <Stack gap="xs" style={{ flex: 1 }}>
+                        <Text size="xs" c="dimmed" fw={700}>{t('voc.incoming')}</Text>
+                        {feedbacks.length === 0 && <Text size="sm" c="dimmed" fs="italic">{t('voc.empty_feedback')}</Text>}
+                        {feedbacks.map((item) => (
+                            <Card key={item.id} p="sm" radius="md" bg="dark.6" withBorder>
+                                <Group justify="space-between" mb="xs">
+                                    <Group gap="xs">
+                                        <Avatar src={item.avatar} size="xs" radius="xl" />
+                                        <Text size="xs" fw={500}>{item.user}</Text>
+                                    </Group>
+                                    <Badge size="xs" variant="outline" color="gray">{item.source}</Badge>
                                 </Group>
-                                <Badge size="xs" variant="outline" color="gray">{item.source}</Badge>
-                            </Group>
-                            <Text size="sm" lineClamp={2} mb="xs">"{item.message}"</Text>
-                            <Group gap="xs">
-                                {item.type === 'bug' && <Badge size="xs" color="red" leftSection={<Bug size={10} />}>Bug</Badge>}
-                                {item.type === 'feature' && <Badge size="xs" color="blue" leftSection={<Zap size={10} />}>Feature</Badge>}
-                                {item.type === 'performance' && <Badge size="xs" color="orange" leftSection={<AlertTriangle size={10} />}>Perf</Badge>}
-                            </Group>
-                        </Card>
-                    ))}
-                </Stack>
+                                <Text size="sm" lineClamp={2} mb="xs">"{item.message}"</Text>
+                                <Group gap="xs">
+                                    {item.type === 'bug' && <Badge size="xs" color="red" leftSection={<Bug size={10} />}>Bug</Badge>}
+                                    {item.type === 'feature' && <Badge size="xs" color="blue" leftSection={<Zap size={10} />}>Feature</Badge>}
+                                    {item.type === 'performance' && <Badge size="xs" color="orange" leftSection={<AlertTriangle size={10} />}>Perf</Badge>}
+                                </Group>
+                            </Card>
+                        ))}
+                    </Stack>
 
-                {/* AI Processing Arrow */}
-                <Stack align="center" justify="center" h={200} visibleFrom="sm">
-                    <ArrowRight size={24} color="gray" />
-                </Stack>
+                    {/* AI Processing Arrow */}
+                    <Stack align="center" justify="center" h={200} visibleFrom="sm">
+                        <ArrowRight size={24} color="gray" />
+                    </Stack>
 
-                {/* Tickets Column */}
-                <Stack gap="xs" style={{ flex: 1 }}>
-                    <Text size="xs" c="dimmed" fw={700}>{t('voc.generated')}</Text>
-                    {processed.length === 0 && <Text size="sm" c="dimmed" fs="italic">{t('voc.empty_ticket')}</Text>}
-                    {processed.map((ticket, idx) => (
-                        <Card key={idx} p="sm" radius="md" bg="rgba(40, 50, 60, 0.5)" style={{ borderLeft: '4px solid var(--mantine-color-teal-5)' }} withBorder>
-                            <Group justify="space-between" mb="xs">
-                                <Text size="xs" fw={700} c="teal.4">{ticket.id}</Text>
-                                <Badge size="xs" color="red" variant="filled">{ticket.priority}</Badge>
-                            </Group>
-                            <Text size="sm" fw={600} mb="xs">{ticket.title}</Text>
-                            <Group gap="xs">
-                                {ticket.tags.map((tag: string) => (
-                                    <Badge key={tag} size="xs" variant="dot" color="gray">{tag}</Badge>
-                                ))}
-                            </Group>
-                            {ticket.origin && (
-                                <Text size="xs" c="dimmed" mt="xs" fs="italic">Derived from user: {ticket.origin.user}</Text>
-                            )}
-                        </Card>
-                    ))}
-                </Stack>
-            </Group>
+                    {/* Tickets Column */}
+                    <Stack gap="xs" style={{ flex: 1 }}>
+                        <Text size="xs" c="dimmed" fw={700}>{t('voc.generated')}</Text>
+                        {processed.length === 0 && <Text size="sm" c="dimmed" fs="italic">{t('voc.empty_ticket')}</Text>}
+                        {processed.map((ticket, idx) => (
+                            <Card key={idx} p="sm" radius="md" bg="rgba(40, 50, 60, 0.5)" style={{ borderLeft: '4px solid var(--mantine-color-teal-5)' }} withBorder>
+                                <Group justify="space-between" mb="xs">
+                                    <Text size="xs" fw={700} c="teal.4">{ticket.id}</Text>
+                                    <Badge size="xs" color="red" variant="filled">{ticket.priority}</Badge>
+                                </Group>
+                                <Text size="sm" fw={600} mb="xs">{ticket.title}</Text>
+                                <Group gap="xs">
+                                    {ticket.tags.map((tag: string) => (
+                                        <Badge key={tag} size="xs" variant="dot" color="gray">{tag}</Badge>
+                                    ))}
+                                </Group>
+                                {ticket.origin && (
+                                    <Text size="xs" c="dimmed" mt="xs" fs="italic">Derived from user: {ticket.origin.user}</Text>
+                                )}
+                            </Card>
+                        ))}
+                    </Stack>
+                </Group>
+            )}
         </Paper>
     );
 }

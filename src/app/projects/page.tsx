@@ -1,18 +1,58 @@
 'use client';
 
-import { Container, Title, Text, Group, TextInput, Select, SimpleGrid, Button, Badge, Paper, ActionIcon, ThemeIcon } from '@mantine/core';
-import { Search, Filter, Plus, MoreHorizontal, FolderGit2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Container, Title, Text, Group, TextInput, Select, SimpleGrid, Button, Modal, Stack, Loader, Center } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { Search, Filter, Plus, RefreshCw } from 'lucide-react';
 import { Sidebar } from '@/components/Layout/Sidebar';
-
-const projects = [
-    { id: 1, name: 'Neon Ecommerce', status: 'In Progress', type: 'Web App', lead: 'Alice', tasks: 12 },
-    { id: 2, name: 'Zen Portfolio', status: 'Live', type: 'Website', lead: 'Bob', tasks: 0 },
-    { id: 3, name: 'Crypto Dashboard', status: 'Risk', type: 'Dashboard', lead: 'Charlie', tasks: 4 },
-    { id: 4, name: 'Social Feed App', status: 'Live', type: 'Mobile', lead: 'Alice', tasks: 2 },
-    { id: 5, name: 'Internal Tools', status: 'In Progress', type: 'Internal', lead: 'Dave', tasks: 8 },
-];
+import { ProjectCard } from '@/components/Dashboard/ProjectCard';
 
 export default function ProjectsPage() {
+    const [projects, setProjects] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [opened, { open, close }] = useDisclosure(false);
+    const [newProjectName, setNewProjectName] = useState('');
+    const [newProjectRepo, setNewProjectRepo] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+
+    const fetchProjects = async () => {
+        try {
+            setLoading(true);
+            const res = await fetch('/api/projects');
+            const data = await res.json();
+            if (Array.isArray(data)) {
+                setProjects(data);
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchProjects();
+    }, []);
+
+    const handleCreateProject = async () => {
+        if (!newProjectName) return;
+        setSubmitting(true);
+        try {
+            await fetch('/api/projects', {
+                method: 'POST',
+                body: JSON.stringify({ name: newProjectName, repo: newProjectRepo })
+            });
+            await fetchProjects();
+            close();
+            setNewProjectName('');
+            setNewProjectRepo('');
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     return (
         <div style={{ display: 'flex' }}>
             <Sidebar />
@@ -20,59 +60,55 @@ export default function ProjectsPage() {
                 <Container size="xl">
                     <Group justify="space-between" mb="xl">
                         <div>
-                            <Title order={1}>Projects</Title>
-                            <Text c="dimmed">Manage all your active workspaces.</Text>
+                            <Title order={1}>System Status</Title>
+                            <Text c="dimmed">Monitor microservices capability and health.</Text>
                         </div>
-                        <Button leftSection={<Plus size={18} />} variant="gradient" gradient={{ from: 'brand', to: 'cyan' }}>New Project</Button>
+                        <Group>
+                            <Button variant="subtle" onClick={fetchProjects} leftSection={<RefreshCw size={16} />}>Refresh</Button>
+                            <Button leftSection={<Plus size={18} />} variant="gradient" gradient={{ from: 'teal', to: 'lime' }} onClick={open}>Add Service</Button>
+                        </Group>
                     </Group>
 
                     <Group mb="xl">
                         <TextInput
-                            placeholder="Search projects..."
+                            placeholder="Search services..."
                             leftSection={<Search size={16} />}
                             style={{ flex: 1 }}
                         />
                         <Select
                             placeholder="Status"
-                            data={['All', 'Live', 'In Progress', 'Risk']}
+                            data={['All', 'Active', 'Degraded', 'Maintenance']}
                             leftSection={<Filter size={16} />}
                             w={150}
                         />
                     </Group>
 
-                    <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
-                        {projects.map((project) => (
-                            <Paper key={project.id} p="lg" radius="md" withBorder style={{
-                                background: 'rgba(255,255,255,0.03)',
-                                borderColor: 'rgba(255,255,255,0.05)',
-                                transition: 'transform 0.2s',
-                            }}>
-                                <Group justify="space-between" mb="md">
-                                    <ThemeIcon variant="light" size="lg" radius="md" color="blue">
-                                        <FolderGit2 size={20} />
-                                    </ThemeIcon>
-                                    <ActionIcon variant="subtle" color="gray">
-                                        <MoreHorizontal size={18} />
-                                    </ActionIcon>
-                                </Group>
-
-                                <Title order={3} size="h4" mb={5}>{project.name}</Title>
-                                <Text size="sm" c="dimmed" mb="md">{project.type} • Lead by {project.lead}</Text>
-
-                                <Group justify="space-between" align="center" mt="auto">
-                                    <Badge
-                                        variant="dot"
-                                        color={project.status === 'Live' ? 'teal' : project.status === 'Risk' ? 'red' : 'blue'}
-                                    >
-                                        {project.status}
-                                    </Badge>
-                                    <Text size="xs" c="dimmed">{project.tasks} active tasks</Text>
-                                </Group>
-                            </Paper>
-                        ))}
-                    </SimpleGrid>
+                    {loading ? (
+                        <Center h={300}><Loader /></Center>
+                    ) : (
+                        <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
+                            {projects.map((project) => (
+                                <ProjectCard
+                                    key={project.id}
+                                    title={project.name}
+                                    description={`Repo: ${project.repo}`}
+                                    status={project.status}
+                                    tags={['Service', 'API']}
+                                    lastDeployed={project.last_deploy}
+                                />
+                            ))}
+                        </SimpleGrid>
+                    )}
                 </Container>
             </main>
+
+            <Modal opened={opened} onClose={close} title="Register New Service" centered>
+                <Stack>
+                    <TextInput label="Service Name" placeholder="e.g. Auth Service" value={newProjectName} onChange={(e) => setNewProjectName(e.target.value)} withAsterisk />
+                    <TextInput label="Repository" placeholder="e.g. org/repo" value={newProjectRepo} onChange={(e) => setNewProjectRepo(e.target.value)} />
+                    <Button onClick={handleCreateProject} loading={submitting} fullWidth mt="md" color="teal">Register Service</Button>
+                </Stack>
+            </Modal>
         </div>
     );
 }

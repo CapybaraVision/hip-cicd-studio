@@ -1,106 +1,180 @@
 'use client';
 
-import { Paper, Title, Text, Group, ThemeIcon, Stack, RingProgress, Center } from '@mantine/core';
-import { GitCommit, Package, TestTube, Rocket, CheckCircle2, CircleDashed } from 'lucide-react';
-import { motion } from 'framer-motion';
-
-const steps = [
-    { id: 1, label: '소스 코드', icon: GitCommit, status: 'completed' },
-    { id: 2, label: '빌드', icon: Package, status: 'completed' },
-    { id: 3, label: '테스트', icon: TestTube, status: 'processing' },
-    { id: 4, label: '배포', icon: Rocket, status: 'pending' },
-];
+import { useState, useEffect } from 'react';
+import { Paper, Title, Text, Group, ThemeIcon, Stack, Table, Badge, Loader, Center, Button, Drawer, Timeline, ActionIcon, List, Alert } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { GitCommit, Package, TestTube, Rocket, CheckCircle2, XCircle, Clock, RefreshCw, AlertTriangle, RotateCcw, Play, ExternalLink } from 'lucide-react';
 
 export function Pipeline() {
+    const [pipelines, setPipelines] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [opened, { open, close }] = useDisclosure(false);
+    const [selectedBuild, setSelectedBuild] = useState<any>(null);
+
+    const fetchPipelines = async () => {
+        try {
+            setLoading(true);
+            const res = await fetch('/api/pipeline');
+            const data = await res.json();
+            if (Array.isArray(data)) {
+                setPipelines(data);
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchPipelines();
+    }, []);
+
+    const handleRowClick = (row: any) => {
+        setSelectedBuild(row);
+        open();
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'success': return 'teal';
+            case 'failed': return 'red';
+            case 'building': return 'blue';
+            default: return 'gray';
+        }
+    };
+
+    const getStatusIcon = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'success': return <CheckCircle2 size={16} />;
+            case 'failed': return <XCircle size={16} />;
+            case 'building': return <Loader size={16} />;
+            default: return <Clock size={16} />;
+        }
+    };
+
     return (
         <Stack gap="xl">
-            <Title order={3}>현재 배포 파이프라인</Title>
-            {/* Desktop View (Horizontal) */}
-            <Group justify="center" gap={0} visibleFrom="sm" w="100%">
-                {steps.map((step, index) => {
-                    const isLast = index === steps.length - 1;
-                    return (
-                        <Group key={step.id} gap={0} align="center" style={{ flex: isLast ? 0 : 1 }}>
-                            <Stack align="center" gap="xs" style={{ zIndex: 2, position: 'relative' }}>
-                                <motion.div
-                                    initial={{ scale: 0.8, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    transition={{ delay: index * 0.2 }}
-                                >
-                                    <div style={{ position: 'relative' }}>
-                                        {step.status === 'processing' && (
-                                            <div style={{ position: 'absolute', top: -5, left: -5, right: -5, bottom: -5 }}>
-                                                <RingProgress
-                                                    size={60}
-                                                    thickness={3}
-                                                    sections={[{ value: 75, color: 'cyan' }]}
-                                                    style={{ animation: 'spin 2s linear infinite' }}
-                                                />
-                                                <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
-                                            </div>
-                                        )}
-                                        <ThemeIcon
-                                            size={50}
-                                            radius="xl"
-                                            variant={step.status === 'pending' ? 'outline' : 'light'}
-                                            color={step.status === 'completed' ? 'teal' : step.status === 'processing' ? 'cyan' : 'gray'}
-                                        >
-                                            <step.icon size={24} />
-                                        </ThemeIcon>
-
-                                        {step.status === 'completed' && (
-                                            <div style={{ position: 'absolute', bottom: -5, right: -5, background: '#1a1b1e', borderRadius: '50%' }}>
-                                                <CheckCircle2 size={16} color="var(--mantine-color-teal-5)" fill="var(--mantine-color-teal-9)" />
-                                            </div>
-                                        )}
-                                    </div>
-                                </motion.div>
-                                <Text fw={600} size="sm" c={step.status === 'pending' ? 'dimmed' : 'white'}>{step.label}</Text>
-                            </Stack>
-
-                            {!isLast && (
-                                <div style={{ flex: 1, height: 2, background: 'var(--mantine-color-dark-4)', margin: '0 20px', position: 'relative', top: -14 }}>
-                                    <motion.div
-                                        initial={{ width: 0, opacity: 0 }}
-                                        animate={{ width: '100%', opacity: step.status === 'completed' ? 1 : 0.3 }}
-                                        transition={{ delay: index * 0.2 + 0.1, duration: 0.5 }}
-                                        style={{ height: '100%', background: 'var(--mantine-color-teal-6)' }}
-                                    />
-                                </div>
-                            )}
-                        </Group>
-                    )
-                })}
+            <Group justify="space-between">
+                <div>
+                    <Title order={3}>Release Command Center</Title>
+                    <Text c="dimmed" size="sm">Manage deployments, rollback, and trace feature release.</Text>
+                </div>
+                <Button variant="light" leftSection={<RefreshCw size={16} />} onClick={fetchPipelines}>Refresh</Button>
             </Group>
 
-            {/* Mobile View (Vertical) */}
-            <Stack hiddenFrom="sm" w="100%" gap="md" align="center">
-                {steps.map((step, index) => (
-                    <Group key={step.id} w="100%" justify="space-between">
-                        <Group>
-                            <ThemeIcon
-                                size={40}
-                                radius="xl"
-                                variant={step.status === 'pending' ? 'outline' : 'light'}
-                                color={step.status === 'completed' ? 'teal' : step.status === 'processing' ? 'cyan' : 'gray'}
-                            >
-                                <step.icon size={20} />
-                            </ThemeIcon>
-                            <Text fw={600}>{step.label}</Text>
-                        </Group>
-                        {step.status === 'completed' && <CheckCircle2 color="teal" size={20} />}
-                        {step.status === 'processing' && <Text c="cyan" size="xs">Running...</Text>}
-                    </Group>
-                ))}
-            </Stack>
+            {loading ? (
+                <Center h={200}><Loader /></Center>
+            ) : (
+                <Paper withBorder radius="md" style={{ overflow: 'hidden' }}>
+                    <Table verticalSpacing="sm" highlightOnHover>
+                        <Table.Thead>
+                            <Table.Tr>
+                                <Table.Th>Build ID</Table.Th>
+                                <Table.Th>Service</Table.Th>
+                                <Table.Th>Version</Table.Th>
+                                <Table.Th>Status</Table.Th>
+                                <Table.Th>Features</Table.Th>
+                                <Table.Th>Author</Table.Th>
+                                <Table.Th>Time</Table.Th>
+                                <Table.Th>Action</Table.Th>
+                            </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>
+                            {pipelines.map((row) => (
+                                <Table.Tr key={row.id} style={{ cursor: 'pointer' }} onClick={() => handleRowClick(row)}>
+                                    <Table.Td><Text fz="sm" fw={700} c="brand">{row.id}</Text></Table.Td>
+                                    <Table.Td><Badge variant="light" color="gray">{row.service_id}</Badge></Table.Td>
+                                    <Table.Td><Text fz="sm" ff="monospace">{row.version}</Text></Table.Td>
+                                    <Table.Td>
+                                        <Badge
+                                            color={getStatusColor(row.status)}
+                                            variant="light"
+                                            leftSection={getStatusIcon(row.status)}
+                                        >
+                                            {row.status}
+                                        </Badge>
+                                    </Table.Td>
+                                    <Table.Td>
+                                        {row.features ? (
+                                            <Group gap={5}>
+                                                <GitCommit size={14} />
+                                                <Text size="xs">{row.features.split(',').length} features</Text>
+                                            </Group>
+                                        ) : <Text size="xs" c="dimmed">-</Text>}
+                                    </Table.Td>
+                                    <Table.Td><Text fz="sm" c="dimmed">@{row.author}</Text></Table.Td>
+                                    <Table.Td><Text fz="sm" c="dimmed">{row.time}</Text></Table.Td>
+                                    <Table.Td>
+                                        <Button size="xs" variant="default" onClick={(e) => { e.stopPropagation(); handleRowClick(row); }}>Manage</Button>
+                                    </Table.Td>
+                                </Table.Tr>
+                            ))}
+                        </Table.Tbody>
+                    </Table>
+                </Paper>
+            )}
 
-            <Paper p="xl" radius="md" withBorder bg="dark.8" mt="xl">
-                <Group>
-                    <CircleDashed size={20} className="spin" />
-                    <Text>테스트 러너가 실행 중입니다... (3/12 완료)</Text>
-                </Group>
-                {/* Terminal output mockup could go here */}
-            </Paper>
+            <Drawer position="right" size="md" opened={opened} onClose={close} title={<Title order={4}>Deployment Details: {selectedBuild?.id}</Title>}>
+                {selectedBuild && (
+                    <Stack gap="lg">
+                        <Paper withBorder p="md" radius="md" bg="dark.8">
+                            <Group justify="space-between" mb="xs">
+                                <Text fw={700} size="lg">{selectedBuild.service_id} <span style={{ fontWeight: 400 }}>v{selectedBuild.version}</span></Text>
+                                <Badge size="lg" color={getStatusColor(selectedBuild.status)}>{selectedBuild.status}</Badge>
+                            </Group>
+                            <Text size="sm" c="dimmed">Triggered via {selectedBuild.trigger} by @{selectedBuild.author}</Text>
+                        </Paper>
+
+                        <div>
+                            <Text fw={700} mb="sm">Included Features (Traceability)</Text>
+                            {selectedBuild.features ? (
+                                <Stack gap="xs">
+                                    {selectedBuild.features.split(',').map((feat: string) => (
+                                        <Paper key={feat} withBorder p="sm" radius="sm">
+                                            <Group justify="space-between">
+                                                <Group gap="xs">
+                                                    <ExternalLink size={14} />
+                                                    <Text size="sm">{feat.trim()}</Text>
+                                                </Group>
+                                                <Badge size="xs" color="gray">Done</Badge>
+                                            </Group>
+                                        </Paper>
+                                    ))}
+                                </Stack>
+                            ) : (
+                                <Alert color="gray" icon={<AlertTriangle size={16} />}>No features linked to this build.</Alert>
+                            )}
+                        </div>
+
+                        <div>
+                            <Text fw={700} mb="sm">Deployment Timeline</Text>
+                            <Timeline active={selectedBuild.status === 'Success' ? 3 : 1} bulletSize={24} lineWidth={2}>
+                                <Timeline.Item bullet={<GitCommit size={12} />} title="Code Checkout">
+                                    <Text c="dimmed" size="xs">Pulled from main branch</Text>
+                                </Timeline.Item>
+                                <Timeline.Item bullet={<Package size={12} />} title="Build Image">
+                                    <Text c="dimmed" size="xs">Docker build completed</Text>
+                                </Timeline.Item>
+                                <Timeline.Item bullet={<TestTube size={12} />} title="Unit Tests">
+                                    <Text c="dimmed" size="xs">Passed 142 tests</Text>
+                                </Timeline.Item>
+                                <Timeline.Item bullet={<Rocket size={12} />} title="Deploy to Cluster">
+                                    <Text c="dimmed" size="xs">Helm chart updated</Text>
+                                </Timeline.Item>
+                            </Timeline>
+                        </div>
+
+                        <Paper withBorder p="md" radius="md" mt="auto">
+                            <Text fw={700} mb="md">Release Actions</Text>
+                            <Group grow>
+                                <Button color="red" leftSection={<RotateCcw size={16} />} variant="light">Rollback v{selectedBuild.version}</Button>
+                                <Button color="blue" leftSection={<Play size={16} />} variant="light">Re-deploy</Button>
+                            </Group>
+                        </Paper>
+                    </Stack>
+                )}
+            </Drawer>
         </Stack>
     );
 }
