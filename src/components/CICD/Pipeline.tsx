@@ -62,6 +62,29 @@ export function Pipeline() {
                     <Text c="dimmed" size="sm">Manage deployments, rollback, and trace feature release.</Text>
                 </div>
                 <Button variant="light" leftSection={<RefreshCw size={16} />} onClick={fetchPipelines}>Refresh</Button>
+                <Button
+                    variant="filled"
+                    color="blue"
+                    leftSection={<Play size={16} />}
+                    onClick={async () => {
+                        const service = prompt("Enter Service ID to deploy (e.g., hip-frontend):", "hip-frontend");
+                        if (!service) return;
+                        setLoading(true);
+                        await fetch('/api/webhooks/deploy', {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                ref: 'main',
+                                repository: { name: service },
+                                head_commit: { message: 'Manual Trigger', id: 'manual-run' },
+                                sender: { login: 'user-manual' }
+                            })
+                        });
+                        setLoading(false);
+                        fetchPipelines();
+                    }}
+                >
+                    Run Pipeline
+                </Button>
             </Group>
 
             <PipelineVisual />

@@ -16,7 +16,7 @@ import { DashboardHeader } from '@/components/Dashboard/DashboardHeader';
 import { Timeline } from '@/components/Project/Timeline';
 import { Box, Badge, Paper } from '@mantine/core';
 import { useLanguage } from '@/contexts/LanguageContext';
-import ProjectsPage from './projects/page';
+import { SystemStatus } from '@/components/Dashboard/SystemStatus';
 
 
 const projects = [
@@ -107,7 +107,7 @@ export default function Home() {
             </Tabs.Panel>
 
             <Tabs.Panel value="status">
-              <ProjectsPage />
+              <SystemStatus />
             </Tabs.Panel>
 
             <Tabs.Panel value="cicd">

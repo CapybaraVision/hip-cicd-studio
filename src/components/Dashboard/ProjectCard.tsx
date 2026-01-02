@@ -30,7 +30,7 @@ export function ProjectCard({ title, description, status, tags, lastDeployed }: 
             <Card.Section className={classes.section}>
                 <Group justify="space-between">
                     <Badge
-                        variant="dot"
+                        variant="light"
                         size="lg"
                         color={getStatusColor(status)}
                         className={classes.badge}
