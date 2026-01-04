@@ -3,6 +3,7 @@ import './globals.css';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { theme } from '@/theme';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { ProjectProvider } from '@/contexts/ProjectContext';
 
 export const metadata = {
   title: 'Hip CI/CD Studio',
@@ -22,7 +23,9 @@ export default function RootLayout({
       <body>
         <MantineProvider theme={theme} defaultColorScheme="dark">
           <LanguageProvider>
-            {children}
+            <ProjectProvider>
+              {children}
+            </ProjectProvider>
           </LanguageProvider>
         </MantineProvider>
       </body>
