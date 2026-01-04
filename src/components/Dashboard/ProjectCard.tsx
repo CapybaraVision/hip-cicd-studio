@@ -15,15 +15,20 @@ interface ProjectCardProps {
 
 export function ProjectCard({ title, description, status, tags, lastDeployed, selected }: ProjectCardProps) {
     const getStatusColor = (s: string) => {
-        if (s === 'live') return 'teal';
-        if (s === 'failed') return 'red';
-        return 'yellow';
+        const lower = s.toLowerCase();
+        if (lower.includes('active') || lower === 'live') return 'teal';
+        if (lower.includes('maintenance')) return 'orange';
+        if (lower.includes('inactive')) return 'gray';
+        if (lower === 'failed') return 'red';
+        return 'blue';
     };
 
     const getStatusIcon = (s: string) => {
-        if (s === 'live') return <CheckCircle2 size={14} />;
-        if (s === 'failed') return <AlertCircle size={14} />;
-        return <PlayCircle size={14} />;
+        const lower = s.toLowerCase();
+        if (lower.includes('active') || lower === 'live') return <CheckCircle2 size={12} />;
+        if (lower === 'failed') return <AlertCircle size={12} />;
+        if (lower.includes('maintenance')) return <PlayCircle size={12} />;
+        return <PlayCircle size={12} />;
     };
 
     return (
@@ -33,19 +38,20 @@ export function ProjectCard({ title, description, status, tags, lastDeployed, se
             withBorder={selected}
             style={selected ? { borderColor: 'var(--mantine-color-teal-6)', borderWidth: 2 } : undefined}
         >
-            <Card.Section className={classes.section}>
+            <Card.Section className={classes.section} pt="md" px="lg">
                 <Group justify="space-between">
                     <Badge
                         variant="light"
-                        size="lg"
+                        size="sm"
                         color={getStatusColor(status)}
                         className={classes.badge}
                         leftSection={getStatusIcon(status)}
+                        radius="sm"
                     >
                         {status}
                     </Badge>
-                    <ActionIcon variant="subtle" color="gray">
-                        <MoreHorizontal size={18} />
+                    <ActionIcon variant="subtle" color="gray" size="sm">
+                        <MoreHorizontal size={16} />
                     </ActionIcon>
                 </Group>
             </Card.Section>

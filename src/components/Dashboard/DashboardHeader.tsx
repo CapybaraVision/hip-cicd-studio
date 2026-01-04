@@ -48,7 +48,7 @@ export function DashboardHeader() {
                 <Button leftSection={<RotateCcw size={16} />} color="red" variant="light" radius="md" onClick={() => alert('Emergency Rollback triggered!')}>
                     {t('header.rollback')}
                 </Button>
-                <Button variant="default" leftSection={<FileText size={16} />} radius="md" onClick={() => window.open('/api/export?format=json', '_blank')}>
+                <Button variant="default" leftSection={<FileText size={16} />} radius="md" onClick={() => window.open('/api/export?format=html', '_blank')}>
                     {t('header.reports')}
                 </Button>
                 <Button variant="filled" color="cyan" leftSection={<Download size={16} />} radius="md" onClick={() => window.open('/api/export?format=csv', '_blank')}>

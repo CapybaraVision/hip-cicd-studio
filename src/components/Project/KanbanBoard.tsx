@@ -132,14 +132,17 @@ export function KanbanBoard() {
     if (!data) return <Text>Error loading board</Text>;
 
     return (
-        <div className={classes.board}>
-            <Group justify="flex-end" mb="md">
-                <Button leftSection={<RefreshCw size={14} />} variant="subtle" size="xs" onClick={fetchData}>Refresh</Button>
-                <Button leftSection={<Plus size={14} />} variant="gradient" gradient={{ from: 'blue', to: 'cyan' }} size="xs" onClick={open}>Add Task</Button>
+        <div className={classes.board} style={{ width: '100%', height: '100%' }}>
+            <Group justify="space-between" mb="md" px="sm">
+                <Text fw={700} size="lg">Sprint Board</Text>
+                <Group>
+                    <Button leftSection={<RefreshCw size={14} />} variant="subtle" size="xs" onClick={fetchData}>Refresh</Button>
+                    <Button leftSection={<Plus size={14} />} variant="gradient" gradient={{ from: 'blue', to: 'cyan' }} size="xs" onClick={open}>Add Task</Button>
+                </Group>
             </Group>
 
             <DragDropContext onDragEnd={onDragEnd}>
-                <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem' }}>
+                <div style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', paddingBottom: '1rem', width: '100%', justifyContent: 'center' }}>
                     {data.columnOrder.map((columnId: string) => {
                         const column = data.columns[columnId];
                         const tasks = column.taskIds.map((taskId: string) => data.tasks[taskId]);
