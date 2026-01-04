@@ -15,16 +15,17 @@ interface ProjectCardProps {
 
 export function ProjectCard({ title, description, status, tags, lastDeployed, selected }: ProjectCardProps) {
     const getStatusColor = (s: string) => {
-        const lower = s.toLowerCase();
+        const lower = (s || '').toLowerCase();
         if (lower.includes('active') || lower === 'live') return 'teal';
         if (lower.includes('maintenance')) return 'orange';
         if (lower.includes('inactive')) return 'gray';
+        if (lower.includes('degraded')) return 'yellow';
         if (lower === 'failed') return 'red';
         return 'blue';
     };
 
     const getStatusIcon = (s: string) => {
-        const lower = s.toLowerCase();
+        const lower = (s || '').toLowerCase();
         if (lower.includes('active') || lower === 'live') return <CheckCircle2 size={12} />;
         if (lower === 'failed') return <AlertCircle size={12} />;
         if (lower.includes('maintenance')) return <PlayCircle size={12} />;
@@ -36,7 +37,12 @@ export function ProjectCard({ title, description, status, tags, lastDeployed, se
             padding="lg"
             className={classes.card}
             withBorder={selected}
-            style={selected ? { borderColor: 'var(--mantine-color-teal-6)', borderWidth: 2 } : undefined}
+            style={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                ...(selected ? { borderColor: 'var(--mantine-color-teal-6)', borderWidth: 2 } : {})
+            }}
         >
             <Card.Section className={classes.section} pt="md" px="lg">
                 <Group justify="space-between">
@@ -44,7 +50,6 @@ export function ProjectCard({ title, description, status, tags, lastDeployed, se
                         variant="light"
                         size="sm"
                         color={getStatusColor(status)}
-                        className={classes.badge}
                         leftSection={getStatusIcon(status)}
                         radius="sm"
                     >
@@ -60,7 +65,7 @@ export function ProjectCard({ title, description, status, tags, lastDeployed, se
                 {title}
             </Text>
 
-            <Text size="sm" c="dimmed" mt={5} lineClamp={2}>
+            <Text size="sm" c="dimmed" mt={5} lineClamp={2} style={{ flex: 1 }}>
                 {description}
             </Text>
 
@@ -72,7 +77,7 @@ export function ProjectCard({ title, description, status, tags, lastDeployed, se
                 ))}
             </Group>
 
-            <Card.Section className={classes.footer}>
+            <Card.Section className={classes.footer} mt="auto">
                 <Group justify="space-between">
                     <Group gap={5}>
                         <GitBranch size={14} color="gray" />
@@ -81,7 +86,7 @@ export function ProjectCard({ title, description, status, tags, lastDeployed, se
                     <Text size="xs" c="dimmed">Deployed {lastDeployed}</Text>
                 </Group>
 
-                {status === 'building' && (
+                {status?.toLowerCase() === 'building' && (
                     <Box mt="sm">
                         <Progress value={65} animated size="sm" radius="xs" color="brand" />
                     </Box>
