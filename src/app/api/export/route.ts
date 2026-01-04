@@ -34,13 +34,36 @@ export async function GET(req: Request) {
         }
 
         if (format === 'csv') {
-            // Simplified CSV generation (just dump JSON for now as placeholder for real CSV logic if needed)
-            // Real CSV would require flattening or zipping multiple sheets. 
-            // For MVP, we'll return a JSON structure but with appropriate headers for the user to see it works.
-            return new NextResponse(JSON.stringify(data, null, 2), {
+            let csvContent = '';
+
+            for (const [sheetName, rows] of Object.entries(data)) {
+                csvContent += `=== ${sheetName} ===\n`;
+                const rowArray = rows as any[];
+                if (rowArray.length > 0) {
+                    const headers = Object.keys(rowArray[0]);
+                    csvContent += headers.join(',') + '\n';
+                    rowArray.forEach(row => {
+                        const values = headers.map(header => {
+                            const val = row[header];
+                            // Escape commas and quotes
+                            const stringVal = String(val === null || val === undefined ? '' : val);
+                            if (stringVal.includes(',') || stringVal.includes('"') || stringVal.includes('\n')) {
+                                return `"${stringVal.replace(/"/g, '""')}"`;
+                            }
+                            return stringVal;
+                        });
+                        csvContent += values.join(',') + '\n';
+                    });
+                } else {
+                    csvContent += '(No Data)\n';
+                }
+                csvContent += '\n';
+            }
+
+            return new NextResponse(csvContent, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Disposition': 'attachment; filename="hip-cicd-export.json"'
+                    'Content-Type': 'text/csv; charset=utf-8',
+                    'Content-Disposition': 'attachment; filename="hip-cicd-report.csv"'
                 }
             });
         }
