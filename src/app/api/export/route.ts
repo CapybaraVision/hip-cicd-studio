@@ -13,13 +13,22 @@ export async function GET(req: Request) {
         const data: any = {};
 
         for (const sheetName of sheets) {
+            const sheet = doc.sheetsByTitle[sheetName];
+            if (!sheet) continue;
+
             const rows = await getRows(sheetName);
             // Simple serialization of rows
             data[sheetName] = rows.map(r => {
                 const obj: any = {};
-                r._sheet.headerValues.forEach((h: any) => {
-                    obj[h] = r[h];
-                });
+                // sheet.headerValues should be populated after loadInfo
+                if (sheet.headerValues) {
+                    sheet.headerValues.forEach((h: any) => {
+                        obj[h] = r[h];
+                    });
+                } else {
+                    // Fallback if no headers found (shouldn't happen if initialized)
+                    Object.assign(obj, r);
+                }
                 return obj;
             });
         }

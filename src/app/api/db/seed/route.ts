@@ -44,6 +44,16 @@ export async function GET() {
             ]);
         }
 
+        const sprintSheet = doc.sheetsByTitle['Sprint'];
+        if (sprintSheet) {
+            await sprintSheet.addRows([
+                { id: 'TASK-101', title: 'Implement OAuth Login', status: 'Done', assignee: 'davidd', priority: 'High' },
+                { id: 'TASK-102', title: 'Fix Billing Calculation', status: 'Review', assignee: 'sarahj', priority: 'Critical' },
+                { id: 'TASK-103', title: 'Update Dashboard UI', status: 'InProgress', assignee: 'ux-team', priority: 'Medium' },
+                { id: 'TASK-104', title: 'Optimize CDN Cache', status: 'Todo', assignee: 'devops', priority: 'Low' }
+            ]);
+        }
+
         return NextResponse.json({ success: true, message: 'Forced Seed' });
     } catch (error) {
         return NextResponse.json({ success: false, error: String(error) }, { status: 500 });

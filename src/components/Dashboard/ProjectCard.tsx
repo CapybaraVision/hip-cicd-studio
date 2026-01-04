@@ -10,9 +10,10 @@ interface ProjectCardProps {
     status: string;
     tags: string[];
     lastDeployed: string;
+    selected?: boolean;
 }
 
-export function ProjectCard({ title, description, status, tags, lastDeployed }: ProjectCardProps) {
+export function ProjectCard({ title, description, status, tags, lastDeployed, selected }: ProjectCardProps) {
     const getStatusColor = (s: string) => {
         if (s === 'live') return 'teal';
         if (s === 'failed') return 'red';
@@ -26,7 +27,12 @@ export function ProjectCard({ title, description, status, tags, lastDeployed }: 
     };
 
     return (
-        <Card padding="lg" className={classes.card}>
+        <Card
+            padding="lg"
+            className={classes.card}
+            withBorder={selected}
+            style={selected ? { borderColor: 'var(--mantine-color-teal-6)', borderWidth: 2 } : undefined}
+        >
             <Card.Section className={classes.section}>
                 <Group justify="space-between">
                     <Badge

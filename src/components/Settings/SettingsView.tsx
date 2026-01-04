@@ -25,7 +25,7 @@ export function SettingsView() {
                             </div>
                         </Group>
                         <Group>
-                            <Button variant="outline" leftSection={<Download size={16} />} disabled>Export PDF</Button>
+                            <Button variant="outline" leftSection={<Download size={16} />} onClick={() => window.open('/api/export?format=csv', '_blank')}>Export CSV</Button>
                             <Button variant="light" leftSection={<Download size={16} />} onClick={() => window.open('/api/export?format=json', '_blank')}>Export JSON</Button>
                         </Group>
                     </Group>

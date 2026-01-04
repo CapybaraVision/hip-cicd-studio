@@ -5,33 +5,17 @@ import { Title, Text, Group, TextInput, Select, SimpleGrid, Button, Modal, Stack
 import { useDisclosure } from '@mantine/hooks';
 import { Search, Filter, Plus, RefreshCw } from 'lucide-react';
 import { ProjectCard } from '@/components/Dashboard/ProjectCard';
+import { useProject } from '@/contexts/ProjectContext';
 
 export function SystemStatus() {
-    const [projects, setProjects] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { projects, selectedProject, setSelectedProject, loading, refreshProjects } = useProject();
     const [opened, { open, close }] = useDisclosure(false);
     const [newProjectName, setNewProjectName] = useState('');
     const [newProjectRepo, setNewProjectRepo] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
-    const fetchProjects = async () => {
-        try {
-            setLoading(true);
-            const res = await fetch('/api/projects');
-            const data = await res.json();
-            if (Array.isArray(data)) {
-                setProjects(data);
-            }
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchProjects();
-    }, []);
+    // Filter projects logic could be here if we want local filtering by name/status
+    // For now we render all from context
 
     const handleCreateProject = async () => {
         if (!newProjectName) return;
@@ -41,7 +25,7 @@ export function SystemStatus() {
                 method: 'POST',
                 body: JSON.stringify({ name: newProjectName, repo: newProjectRepo })
             });
-            await fetchProjects();
+            await refreshProjects();
             close();
             setNewProjectName('');
             setNewProjectRepo('');
@@ -57,10 +41,10 @@ export function SystemStatus() {
             <Group justify="space-between" mb="xl">
                 <div>
                     <Title order={1}>System Status</Title>
-                    <Text c="dimmed">Monitor microservices capability and health.</Text>
+                    <Text c="dimmed">Select a service to filter dashboard metrics.</Text>
                 </div>
                 <Group>
-                    <Button variant="subtle" onClick={fetchProjects} leftSection={<RefreshCw size={16} />}>Refresh</Button>
+                    <Button variant="subtle" onClick={refreshProjects} leftSection={<RefreshCw size={16} />}>Refresh</Button>
                     <Button leftSection={<Plus size={18} />} variant="gradient" gradient={{ from: 'teal', to: 'lime' }} onClick={open}>Add Service</Button>
                 </Group>
             </Group>
@@ -83,16 +67,26 @@ export function SystemStatus() {
                 <Center h={300}><Loader /></Center>
             ) : (
                 <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
-                    {projects.map((project) => (
-                        <ProjectCard
-                            key={project.id}
-                            title={project.name}
-                            description={`Repo: ${project.repo}`}
-                            status={project.status}
-                            tags={['Service', 'API']}
-                            lastDeployed={project.last_deploy}
-                        />
-                    ))}
+                    {projects.map((project: any) => {
+                        const isSelected = selectedProject?.id === project.id;
+                        return (
+                            <div
+                                key={project.id}
+                                onClick={() => setSelectedProject(isSelected ? null : project)}
+                                style={{ cursor: 'pointer', transform: isSelected ? 'scale(1.02)' : 'scale(1)', transition: 'all 0.2s' }}
+                            >
+                                <ProjectCard
+                                    title={project.name}
+                                    description={`Repo: ${project.repo}`}
+                                    status={project.status}
+                                    tags={['Service', 'API']}
+                                    lastDeployed={project.last_deploy}
+                                    // Add visual cue for selection
+                                    selected={isSelected}
+                                />
+                            </div>
+                        );
+                    })}
                 </SimpleGrid>
             )}
 
